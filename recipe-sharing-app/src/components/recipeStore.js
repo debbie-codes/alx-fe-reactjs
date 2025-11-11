@@ -1,45 +1,48 @@
-// src/recipeStore.js
 import { create } from "zustand";
 
 export const useRecipeStore = create((set, get) => ({
   recipes: [],
-  searchTerm: "",
-  filteredRecipes: [],
+  favorites: [],
+  recommendations: [],
 
-  // Add a new recipe
+  // Recipe CRUD
   addRecipe: (newRecipe) =>
     set((state) => ({
       recipes: [...state.recipes, newRecipe],
-      filteredRecipes: [...state.recipes, newRecipe],
     })),
 
-  // Delete a recipe
   deleteRecipe: (id) =>
     set((state) => ({
       recipes: state.recipes.filter((r) => r.id !== id),
-      filteredRecipes: state.filteredRecipes.filter((r) => r.id !== id),
+      favorites: state.favorites.filter((fid) => fid !== id),
     })),
 
-  // Update a recipe
   updateRecipe: (updatedRecipe) =>
-    set((state) => {
-      const updatedList = state.recipes.map((r) =>
-        r.id === updatedRecipe.id ? updatedRecipe : r
-      );
-      return { recipes: updatedList, filteredRecipes: updatedList };
-    }),
-
-  // Set search term
-  setSearchTerm: (term) => {
-    set({ searchTerm: term });
-    get().filterRecipes(); // Trigger filtering when search term changes
-  },
-
-  // Filter recipes by title
-  filterRecipes: () =>
     set((state) => ({
-      filteredRecipes: state.recipes.filter((recipe) =>
-        recipe.title.toLowerCase().includes(state.searchTerm.toLowerCase())
+      recipes: state.recipes.map((r) =>
+        r.id === updatedRecipe.id ? updatedRecipe : r
       ),
     })),
+
+  // Favorites management
+  addFavorite: (recipeId) => {
+    const favorites = get().favorites;
+    if (!favorites.includes(recipeId)) {
+      set({ favorites: [...favorites, recipeId] });
+    }
+  },
+
+  removeFavorite: (recipeId) =>
+    set({
+      favorites: get().favorites.filter((id) => id !== recipeId),
+    }),
+
+  // Generate simple recommendations based on favorites
+  generateRecommendations: () => {
+    const { recipes, favorites } = get();
+    const recommended = recipes.filter(
+      (recipe) => !favorites.includes(recipe.id) && Math.random() > 0.5
+    );
+    set({ recommendations: recommended });
+  },
 }));
