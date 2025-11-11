@@ -1,38 +1,30 @@
 import React from "react";
-import { useParams, Link } from "react-router-dom";
-import { useRecipeStore } from "./recipeStore";
+import { useParams, useNavigate } from "react-router-dom";
+import { useRecipeStore } from "../recipeStore";
+import EditRecipeForm from "./EditRecipeForm";
 import DeleteRecipeButton from "./DeleteRecipeButton";
 
 const RecipeDetails = () => {
   const { id } = useParams();
-  const recipe = useRecipeStore((s) => s.recipes.find((r) => r.id === id));
+  const recipeId = parseInt(id);
+  const navigate = useNavigate();
+
+  const recipe = useRecipeStore((state) =>
+    state.recipes.find((r) => r.id === recipeId)
+  );
 
   if (!recipe) {
-    return (
-      <div style={{ padding: 20 }}>
-        <h2>Recipe not found</h2>
-        <p>
-          The recipe you are looking for doesn't exist. <Link to="/">Back to list</Link>
-        </p>
-      </div>
-    );
+    return <p>Recipe not found.</p>;
   }
 
   return (
-    <div style={{ padding: 20 }}>
+    <div style={{ padding: "20px" }}>
       <h1>{recipe.title}</h1>
-      <p style={{ whiteSpace: "pre-wrap" }}>{recipe.description}</p>
+      <p>{recipe.description}</p>
 
-      <div style={{ marginTop: 16, display: "flex", gap: 12 }}>
-        <Link to={`/recipes/${id}/edit`}>
-          <button>Edit</button>
-        </Link>
-
-        <DeleteRecipeButton recipeId={id} />
-        <Link to="/">
-          <button>Back</button>
-        </Link>
-      </div>
+      {/* Include Edit and Delete features */}
+      <EditRecipeForm recipe={recipe} />
+      <DeleteRecipeButton recipeId={recipe.id} onDeleted={() => navigate("/")} />
     </div>
   );
 };
