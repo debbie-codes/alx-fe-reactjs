@@ -1,6 +1,6 @@
 import React from "react";
 import { useParams, Link } from "react-router-dom";
-import { useRecipeStore } from "../recipeStore";
+import { useRecipeStore } from "./recipeStore";
 import DeleteRecipeButton from "./DeleteRecipeButton";
 
 const RecipeDetails = () => {
