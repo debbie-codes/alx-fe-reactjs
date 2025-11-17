@@ -8,8 +8,9 @@ const RecommendationsList = () => {
   );
 
   useEffect(() => {
-    generateRecommendations();
-  }, [generateRecommendations]);
+  generateRecommendations();
+  }, []); 
+
 
   if (recommendations.length === 0) {
     return <p>No recommendations available.</p>;
