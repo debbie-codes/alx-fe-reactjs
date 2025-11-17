@@ -1,9 +1,14 @@
+// recipeStore.js
+
 import { create } from "zustand";
 
 export const useRecipeStore = create((set, get) => ({
   recipes: [],
   favorites: [],
   recommendations: [],
+
+  // Set full recipes list
+  setRecipes: (recipes) => set({ recipes }),
 
   // Recipe CRUD
   addRecipe: (newRecipe) =>
@@ -24,7 +29,7 @@ export const useRecipeStore = create((set, get) => ({
       ),
     })),
 
-  // Favorites management
+  // Favorites
   addFavorite: (recipeId) => {
     const favorites = get().favorites;
     if (!favorites.includes(recipeId)) {
@@ -37,7 +42,7 @@ export const useRecipeStore = create((set, get) => ({
       favorites: get().favorites.filter((id) => id !== recipeId),
     }),
 
-  // Generate simple recommendations based on favorites
+  // Recommendations
   generateRecommendations: () => {
     const { recipes, favorites } = get();
     const recommended = recipes.filter(

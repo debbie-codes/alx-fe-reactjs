@@ -15,6 +15,7 @@ function App() {
         <AddRecipeForm />
         <FavoritesList />
         <RecommendationsList />
+        <RecipeList />
 
         <Routes>
           <Route path="/" element={<RecipeList />} />
