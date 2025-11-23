@@ -8,7 +8,7 @@ const Search = () => {
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [page, setPage] = useState(1); // pagination
+  const [page, setPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
 
   const handleSubmit = async (e) => {
@@ -25,8 +25,9 @@ const Search = () => {
       page: 1
     });
 
-    if (!users) {
-      setError("No users found. Try different filters.");
+    // ✅ Corrected error message and condition
+    if (!users || users.length === 0) {
+      setError("Looks like we cant find the user");
     } else {
       setResults(users);
       setTotalCount(total);
@@ -46,7 +47,7 @@ const Search = () => {
       page: nextPage
     });
 
-    if (users) {
+    if (users && users.length > 0) {
       setResults((prev) => [...prev, ...users]);
       setPage(nextPage);
     }
