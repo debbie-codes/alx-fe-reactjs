@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { advancedUserSearch } from "../services/githubService";
+import { advancedUserSearch, fetchUserData } from "../services/githubService";
 
 const Search = () => {
   const [username, setUsername] = useState("");
@@ -8,7 +8,7 @@ const Search = () => {
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(1); // pagination
   const [totalCount, setTotalCount] = useState(0);
 
   const handleSubmit = async (e) => {
@@ -17,21 +17,40 @@ const Search = () => {
     setLoading(true);
     setError("");
     setResults([]);
+    setPage(1);
+    setTotalCount(0);
 
-    const { users, total } = await advancedUserSearch({
-      username,
-      location,
-      minRepos,
-      page: 1
-    });
+    try {
+      let users = [];
+      let total = 0;
 
-    // ✅ Corrected error message and condition
-    if (!users || users.length === 0) {
+      // If only username is filled and no other filters → basic fetch
+      if (username && !location && !minRepos) {
+        const user = await fetchUserData(username);
+        if (user) {
+          users = [user];
+          total = 1;
+        }
+      } else {
+        // Otherwise, use advanced search
+        const response = await advancedUserSearch({
+          username,
+          location,
+          minRepos,
+          page: 1,
+        });
+        users = response.users;
+        total = response.total;
+      }
+
+      if (!users || users.length === 0) {
+        setError("Looks like we cant find the user");
+      } else {
+        setResults(users);
+        setTotalCount(total);
+      }
+    } catch (err) {
       setError("Looks like we cant find the user");
-    } else {
-      setResults(users);
-      setTotalCount(total);
-      setPage(1);
     }
 
     setLoading(false);
@@ -40,22 +59,22 @@ const Search = () => {
   const loadMore = async () => {
     const nextPage = page + 1;
 
-    const { users } = await advancedUserSearch({
+    const response = await advancedUserSearch({
       username,
       location,
       minRepos,
-      page: nextPage
+      page: nextPage,
     });
 
-    if (users && users.length > 0) {
-      setResults((prev) => [...prev, ...users]);
+    if (response.users && response.users.length > 0) {
+      setResults((prev) => [...prev, ...response.users]);
       setPage(nextPage);
     }
   };
 
   return (
     <div className="max-w-2xl mx-auto mt-10 p-4">
-      <h1 className="text-3xl font-bold text-center mb-6">Advanced GitHub User Search</h1>
+      <h1 className="text-3xl font-bold text-center mb-6">GitHub User Search</h1>
 
       {/* Search Form */}
       <form
@@ -67,7 +86,7 @@ const Search = () => {
           <input
             type="text"
             className="w-full border rounded p-2"
-            placeholder="Enter username (optional)"
+            placeholder="Enter username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
           />
@@ -78,7 +97,7 @@ const Search = () => {
           <input
             type="text"
             className="w-full border rounded p-2"
-            placeholder="e.g., Kenya, USA, London"
+            placeholder="Optional: e.g., Kenya, USA, London"
             value={location}
             onChange={(e) => setLocation(e.target.value)}
           />
@@ -89,15 +108,15 @@ const Search = () => {
           <input
             type="number"
             className="w-full border rounded p-2"
-            placeholder="e.g., 10"
+            placeholder="Optional: e.g., 10"
             value={minRepos}
             onChange={(e) => setMinRepos(e.target.value)}
           />
         </div>
 
         <button
-          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
           type="submit"
+          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
         >
           Search
         </button>
@@ -121,12 +140,9 @@ const Search = () => {
               alt={user.login}
               className="w-16 h-16 rounded-full mr-4"
             />
-
             <div className="flex-1">
               <h2 className="text-lg font-bold">{user.login}</h2>
-              <p className="text-sm text-gray-600">
-                Score: {user.score.toFixed(2)}
-              </p>
+              {user.score && <p className="text-sm text-gray-600">Score: {user.score.toFixed(2)}</p>}
               <a
                 href={user.html_url}
                 target="_blank"
