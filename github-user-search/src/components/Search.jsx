@@ -1,4 +1,3 @@
-// src/components/Search.jsx
 import { useState } from "react";
 import { advancedUserSearch, fetchUserData } from "../services/githubService";
 
@@ -24,7 +23,7 @@ const Search = () => {
       let users = [];
       let total = 0;
 
-      // If only username is provided, fetch single user
+      // Use basic fetch if only username is provided
       if (username && !location && !minRepos) {
         const user = await fetchUserData(username);
         if (user) {
@@ -37,7 +36,7 @@ const Search = () => {
           username,
           location,
           minRepos,
-          page: 1,
+          page: 1
         });
         users = response.users;
         total = response.total;
@@ -62,7 +61,7 @@ const Search = () => {
       username,
       location,
       minRepos,
-      page: nextPage,
+      page: nextPage
     });
 
     if (response.users && response.users.length > 0) {

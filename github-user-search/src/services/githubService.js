@@ -1,9 +1,8 @@
-// src/services/githubService.js
 import axios from "axios";
 
 const BASE_URL = "https://api.github.com";
 
-// Fetch single user by username
+
 export const fetchUserData = async (username) => {
   try {
     const response = await axios.get(`${BASE_URL}/users/${username}`);
@@ -14,7 +13,7 @@ export const fetchUserData = async (username) => {
   }
 };
 
-// Advanced search with username, location, min repos, pagination
+
 export const advancedUserSearch = async ({ username, location, minRepos, page = 1 }) => {
   try {
     let query = "";
