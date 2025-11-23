@@ -1,3 +1,4 @@
+// src/components/Search.jsx
 import { useState } from "react";
 import { advancedUserSearch, fetchUserData } from "../services/githubService";
 
@@ -8,12 +9,11 @@ const Search = () => {
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [page, setPage] = useState(1); // pagination
+  const [page, setPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     setLoading(true);
     setError("");
     setResults([]);
@@ -24,7 +24,7 @@ const Search = () => {
       let users = [];
       let total = 0;
 
-      // If only username is filled and no other filters → basic fetch
+      // If only username is provided, fetch single user
       if (username && !location && !minRepos) {
         const user = await fetchUserData(username);
         if (user) {
@@ -32,7 +32,7 @@ const Search = () => {
           total = 1;
         }
       } else {
-        // Otherwise, use advanced search
+        // Advanced search for multiple criteria
         const response = await advancedUserSearch({
           username,
           location,
@@ -49,7 +49,7 @@ const Search = () => {
         setResults(users);
         setTotalCount(total);
       }
-    } catch (err) {
+    } catch {
       setError("Looks like we cant find the user");
     }
 
@@ -58,7 +58,6 @@ const Search = () => {
 
   const loadMore = async () => {
     const nextPage = page + 1;
-
     const response = await advancedUserSearch({
       username,
       location,
@@ -73,7 +72,7 @@ const Search = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto mt-10 p-4">
+    <div className="max-w-3xl mx-auto mt-10 p-4">
       <h1 className="text-3xl font-bold text-center mb-6">GitHub User Search</h1>
 
       {/* Search Form */}
@@ -142,6 +141,12 @@ const Search = () => {
             />
             <div className="flex-1">
               <h2 className="text-lg font-bold">{user.login}</h2>
+              {user.location && <p className="text-sm text-gray-600">Location: {user.location}</p>}
+              {user.public_repos !== undefined && (
+                <p className="text-sm text-gray-600">
+                  Public Repos: {user.public_repos}
+                </p>
+              )}
               {user.score && <p className="text-sm text-gray-600">Score: {user.score.toFixed(2)}</p>}
               <a
                 href={user.html_url}
