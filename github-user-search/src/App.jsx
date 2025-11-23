@@ -1,14 +1,15 @@
 import React from "react";
-import WelcomeMessage from "./components/WelcomeMessage";
-
+import Search from "./components/Search";
 
 function App() {
   return (
-    <div className="App">
-      <h1>GitHub User Search</h1>
-      {/* Future components will go here */}
+    <div style={{ padding: "20px" }}>
+      <h1 style={{ textAlign: "center" }}>GitHub User Search App</h1>
+      <p>Start building your components here...</p>
+      <Search />
     </div>
   );
 }
 
 export default App;
+
